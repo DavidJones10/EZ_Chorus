@@ -23,11 +23,11 @@ EZChorusAudioProcessor::EZChorusAudioProcessor()
 , apvts(*this,
        nullptr,
        "Parameters",
-       { std::make_unique<AudioParameterFloat>(ParameterID("FEEDBACK", 1), "Feedback", NormalisableRange<float> { 0.0f, .98f, .001f }, 0.5f),
-        std::make_unique<AudioParameterFloat>(ParameterID("PHASEOFFSET",1), "Phase Offset", NormalisableRange<float> { 0.0f, 1.0, .01f }, 0.0f) ,
+       { std::make_unique<AudioParameterFloat>(ParameterID("FEEDBACK", 1), "Feedback", NormalisableRange<float> { 0.0f, .98f, .001f }, 0.35f),
+        std::make_unique<AudioParameterFloat>(ParameterID("PHASEOFFSET",1), "Phase Offset", NormalisableRange<float> { 0.0f, 1.0, .01f }, 0.2f) ,
         std::make_unique<AudioParameterFloat>(ParameterID("MIX",1), "Mix", NormalisableRange<float> { 0.0f, 1.0f, .001f }, 0.5f),
-        std::make_unique<AudioParameterFloat>(ParameterID("CHORUSDEPTH",1), "Chorus Depth", NormalisableRange<float> { 0.0f, 1.0f, .001f }, .5f),
-        std::make_unique<AudioParameterFloat>(ParameterID("CHORUSRATE",1), "Chorus Rate", NormalisableRange<float> { 0.0f, 5.0f, .001f }, .5f),
+        std::make_unique<AudioParameterFloat>(ParameterID("CHORUSDEPTH",1), "Chorus Depth", NormalisableRange<float> { 0.0f, 1.0f, .001f }, .35f),
+        std::make_unique<AudioParameterFloat>(ParameterID("CHORUSRATE",1), "Chorus Rate", NormalisableRange<float> { 0.0f, 5.0f, .001f }, .2f),
        }
        )
 #endif
@@ -277,12 +277,19 @@ void EZChorusAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+    auto state = apvts.copyState();
+    std::unique_ptr<juce::XmlElement> xml (state.createXml());
+    copyXmlToBinary (*xml, destData);
 }
 
 void EZChorusAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+    std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+        if (xmlState.get() != nullptr)
+            if (xmlState->hasTagName (apvts.state.getType()))
+                apvts.replaceState (juce::ValueTree::fromXml (*xmlState));
 }
 
 //==============================================================================

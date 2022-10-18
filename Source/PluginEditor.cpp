@@ -53,11 +53,11 @@ EZChorusAudioProcessorEditor::~EZChorusAudioProcessorEditor()
 //==============================================================================
 void EZChorusAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    auto sliderPosFeedback = feedbackSlider.getValue() * ( pi / 3)/ feedbackSlider.getMaximum();
-    auto sliderPosOffset= offsetSlider.getValue() * (pi / 3)/ offsetSlider.getMaximum();
-    auto sliderPosMix = mixSlider.getValue() * (pi / 3)/ mixSlider.getMaximum();
-    auto sliderPosRate = modRateSlider.getValue() * (pi / 3)/ modRateSlider.getMaximum();
-    auto sliderPosDepth = modDepthSlider.getValue() * (pi / 3)/ modDepthSlider.getMaximum();
+    auto sliderPosFeedback = feedbackSlider.getValue() * (pi / (pi+.07))/ feedbackSlider.getMaximum();
+    auto sliderPosOffset= offsetSlider.getValue() / offsetSlider.getMaximum();
+    auto sliderPosMix = mixSlider.getValue() / mixSlider.getMaximum();
+    auto sliderPosRate = modRateSlider.getValue() / modRateSlider.getMaximum();
+    auto sliderPosDepth = modDepthSlider.getValue() / modDepthSlider.getMaximum();
     auto titleFont = Font("Euphemia UCAS", 60.0f, Font::plain);
     auto fillRect2 = Rectangle<float>(mixSlider.getX()-5, mixSlider.getY() - 5, mixSlider.getWidth()+10, mixSlider.getHeight() + 25);
        
