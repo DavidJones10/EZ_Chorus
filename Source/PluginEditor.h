@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include <iostream>
 
 //==============================================================================
 /**
@@ -55,11 +56,12 @@ public:
         g.setColour (juce::Colours::white);
         g.fillPath (p);
         // textbox
-        g.drawFittedText(label , x, slider.getBottom(), width, 25, Justification::centred, 3);
+        g.setFont(24.0f);
+        g.drawFittedText(label , x, slider.getBottom()-5, width, 25, Justification::centred, 3);
         g.setColour(Colours::whitesmoke);
     }
 };
-class EZChorusAudioProcessorEditor  : public juce::AudioProcessorEditor, public OtherLookAndFeel
+class EZChorusAudioProcessorEditor  : public juce::AudioProcessorEditor, public OtherLookAndFeel, public Timer
 {
 public:
     EZChorusAudioProcessorEditor (EZChorusAudioProcessor&);
@@ -106,6 +108,45 @@ public:
         slider.setAlpha(0);
         slider.setLookAndFeel(&otherLookAndFeel);
     }
+    void drawGroupRectangle (Slider& slider1, Slider& slider2, const String& label, Graphics& g, bool isVertical=true, bool hasLabel=false)
+    {
+        
+        int hPad = 10;
+        int vPad = 10;
+        int xpos = slider1.getX() - hPad/2;
+        int ypos = slider1.getY() - vPad/2;
+        int width = 0;
+        int height = 0;
+        if (isVertical)
+        {
+            width = slider1.getWidth() + (hPad);
+            height = (slider1.getHeight() * 2) + distanceBetweenSlidersVertical + (vPad * 3 );
+        }
+        else
+        {
+            width = (slider1.getWidth() * 2) + horizontalDistance + (hPad *2 );
+            height = slider1.getHeight() + (vPad * 2);
+        }
+        g.setColour(Colours::white);
+        g.drawRoundedRectangle(xpos, ypos, width, height, 20, 2);
+        g.setColour(Colours::grey);
+        auto fillRect = Rectangle<float>(xpos, ypos, width, height);
+        g.setOpacity(.5);
+        g.fillRoundedRectangle(fillRect, 20);
+        
+        if (hasLabel)
+        {
+            int textPosX = 0;
+            if (isVertical)
+                textPosX = 0;
+            else
+                textPosX = 0;
+            g.drawFittedText(label, textPosX, slider1.getY() - (vPad*2), width, 20, Justification::centredTop, 3);
+        }
+    
+    }
+    void drawParamText(Graphics& g);
+    void timerCallback() override;
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
@@ -114,7 +155,6 @@ private:
         
     Slider feedbackSlider;
     Slider offsetSlider;
-    Slider lowpassFreqSlider;
     Slider mixSlider;
     Slider modRateSlider;
     Slider modDepthSlider;
@@ -122,7 +162,6 @@ private:
     
     std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> feedbackAttachment;
     std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> offsetAttachment;
-    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> lowpassAttachment;
     std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> mixAttachment;
     std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> modRateAttachment;
     std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> modDepthAttachment;
@@ -132,6 +171,6 @@ private:
     int distanceBetweenSlidersVertical = 20;
     int horizontalDistance = 20;
     int row1X = 10;
-    int column1Y = 10;
+    int column1Y = 75;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EZChorusAudioProcessorEditor)
 };
